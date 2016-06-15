@@ -10,12 +10,15 @@ import {
   StyleSheet,
   Text,
   View,
-  Image
+  Image,
+  TouchableOpacity
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
 const {
   LoginButton,
+  GraphRequest,
+  GraphRequestManager,
 } = FBSDK;
 
 // var Login = React.createClass({
@@ -44,7 +47,7 @@ const {
 class YourApp extends Component {
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <LoginButton
           publishPermissions={["publish_actions"]}
           onLoginFinished={
@@ -59,6 +62,12 @@ class YourApp extends Component {
             }
           }
           onLogoutFinished={() => alert("User logged out")}/>
+
+          <TouchableOpacity style={styles.button} onPress={(event) => this._getName()}
+          underlayColor='#99d9f4'>
+          <Text style={styles.buttonText} >getName</Text>
+          </TouchableOpacity>
+
       </View>
       // <View style={styles.container}>
       //   <Text style={styles.welcome}>
@@ -74,7 +83,28 @@ class YourApp extends Component {
       // </View>
     );
   }
+
+  _getName() {
+    const infoRequest = new GraphRequest(
+      '/me',
+      null,
+      this._responseInfoCallback,
+    );
+
+    new GraphRequestManager().addRequest(infoRequest).start();
+  }
+
+  _responseInfoCallback(error: ?Object, result: ?Object) {
+    if (error) {
+      alert('Error fetching data: ' + error.toString());
+    } else {
+      alert('Success fetching data: ' + result.name);
+    }
+  }
+
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -93,6 +123,17 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+
+  button: {
+  height: 20,
+  flexDirection: 'row',
+  backgroundColor: '#48BBEC',
+  borderColor: '#48BBEC',
+  borderWidth: 1,
+  borderRadius: 8,
+  marginBottom: 10,
+  justifyContent: 'center'
+},
 });
 
 AppRegistry.registerComponent('YourApp', () => YourApp);
